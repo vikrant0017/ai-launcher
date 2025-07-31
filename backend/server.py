@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
-from assistant import ask
 from fastapi.middleware.cors import CORSMiddleware
+
+from assistant import ask
 
 app = FastAPI()
 app.add_middleware(

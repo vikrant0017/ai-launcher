@@ -3,6 +3,42 @@ import path from "node:path";
 import started from "electron-squirrel-startup";
 import Storage from "./storage";
 
+import {spawn, ChildProcess, execFile} from 'node:child_process'
+// import process from "node:process";
+
+
+function startProcess() {
+  console.log('STARTING PROCESS******')
+  const execPath = process.env.BACKEND_EXEC_PATH  // abs path to python path
+
+  const childProcess = spawn(execPath, {
+    env: {...process.env},
+    stdio: ['pipe', 'pipe' , 'pipe'],
+    shell: true,
+    windowsHide: true
+  });
+  
+  childProcess.stdout.on("data", (data) => {
+    console.log(`stdout:${data}`)
+  })
+
+  childProcess.stderr.on("data", (data) => {
+    console.log(`stderr:${data}`)
+  })
+
+   // Handle childProcess exit
+  childProcess.on('close', (code) => {
+    console.log(`Child childProcess exited with code ${code}`);
+  });
+
+  // Handle childProcess error
+  childProcess.on('error', (error) => {
+    console.error('Failed to start childProcess:', error);
+  });
+}
+
+startProcess()
+
 const contentStore = new Storage(
   (() => {
     let baseDir: string;
@@ -68,6 +104,7 @@ const createWindow = () => {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
       contextIsolation: true,
+      webSecurity: false,
     },
   });
 

@@ -24,7 +24,9 @@ jobs:
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
-          files: out/electron*/**
+          files: |
+            out/make/zip/linux/x64/*.zip
+            out/ai-launcher-linux-x64/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       

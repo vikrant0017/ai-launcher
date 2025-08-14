@@ -15,8 +15,6 @@ const config: ForgeConfig = {
   makers: [
     new MakerSquirrel({}),
     new MakerZIP({}, ["linux"]),
-    new MakerRpm({}),
-    new MakerDeb({}),
   ],
   plugins: [
     new VitePlugin({

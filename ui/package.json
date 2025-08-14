@@ -1,6 +1,6 @@
 {
   "name": "ai-launcher",
-  "productName": "AI Launcher",
+  "productName": "ai-launcher",
   "version": "0.0.1",
   "description": "A simple laucher for Q/A",
   "main": ".vite/build/main.js",
@@ -19,7 +19,7 @@
     "test:e2e": "playwright test",
     "test:all": "vitest run && playwright test"
   },
-  "author": "ROG <luan.roger.2003@gmail.com>",
+  "author": "Vikrant <pradhan.vikrant.17@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "@electron-forge/cli": "^7.8.2",

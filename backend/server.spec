@@ -1,28 +1,25 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_all
 
-datas = []
-binaries = []
-hiddenimports = []
-tmp_ret = collect_all('tiktoken')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
-tmp_ret = collect_all('litellm')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+from PyInstaller.utils.hooks import collect_data_files, collect_all
 
+datas, binaries, hiddenimports = collect_all('chromadb')
+datas += collect_data_files("litellm")
+
+hiddenimports += [
+    "tiktoken_ext",
+    "tiktoken_ext.openai_public"
+]
 
 a = Analysis(
     ['server.py'],
     pathex=[],
     binaries=binaries,
-    datas=datas + [('.env', '.')],
-    hiddenimports=[
-        'tiktoken_ext.openai_public', 
-        'tiktoken_ext'
-    ],
+    datas=datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['matplotlib', 'pandas', 'pyarrow', 'scipy', 'uvloop' ],
     noarchive=False,
     optimize=0,
 )

@@ -1,12 +1,12 @@
 import os
 
 import dotenv
-import dspy
 
+import dspy
 dotenv.load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-lm = dspy.LM("gemini/gemini-2.5-flash", api_key=GEMINI_API_KEY, temperature=0.5)
+lm = dspy.LM("gemini/gemini-2.5-flash-lite", api_key=GEMINI_API_KEY, temperature=0.5)
 dspy.configure(lm=lm)
 
 

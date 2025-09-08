@@ -18,3 +18,9 @@ mlartifacts
 
 # Environment variables
 .env
+
+# ChromaStore
+chroma/
+
+# Temporary files for development
+tmp/

@@ -76,6 +76,7 @@
     "babel-plugin-react-compiler": "^19.0.0-beta-e993439-20250328",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.2",
     "electron-squirrel-startup": "^1.0.1",
     "i18next": "^25.3.2",
     "lucide-react": "^0.536.0",

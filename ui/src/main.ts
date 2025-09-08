@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from "electron";
+import dotenv from "dotenv";
 import registerListeners from "./helpers/ipc/listeners-register";
 // "electron-squirrel-startup" seems broken when packaging with vite
 //import started from "electron-squirrel-startup";
@@ -7,7 +8,9 @@ import {
   installExtension,
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
+import { spawn, ChildProcess } from "child_process";
 
+dotenv.config();
 const inDevelopment = process.env.NODE_ENV === "development";
 
 function createWindow() {
@@ -45,8 +48,6 @@ async function installExtensions() {
   }
 }
 
-app.whenReady().then(createWindow).then(installExtensions);
-
 //osX only
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -59,4 +60,64 @@ app.on("activate", () => {
     createWindow();
   }
 });
-//osX only ends
+
+// Run a python server in the background when electron starts before the window is opened
+let pythonProcess: ChildProcess | null = null;
+
+function startPythonServer(
+  pythonExecutable: string,
+  args: string[] = [],
+  env = {},
+) {
+  try {
+    const child = spawn(pythonExecutable, args, {
+      env: env,
+    });
+    pythonProcess = child;
+
+    child.on("error", (err) => {
+      console.error("Failed to start python process:", err);
+      pythonProcess = null;
+    });
+
+    // stdout/stderr can be null if the process fails to spawn.
+    if (child.stdout) {
+      child.stdout.on("data", (data) => {
+        console.log(`Python stdout: ${data}`);
+      });
+    }
+
+    if (child.stderr) {
+      child.stderr.on("data", (data) => {
+        console.error(`Python stderr: ${data}`);
+      });
+    }
+
+    child.on("close", (code) => {
+      console.log(`Python process exited with code ${code}`);
+      pythonProcess = null;
+    });
+  } catch (err) {
+    console.error("Error spawning python process:", err);
+    pythonProcess = null;
+  }
+}
+
+app.whenReady().then(() => {
+  // Only spwan the python process if explictly PYTHON_PATH env is passed
+  if (process.env.PYTHON_PATH) {
+    startPythonServer(process.env.PYTHON_PATH, [], {
+      WATCH_DIR: process.env.WATCH_DIR,
+      TRACK_FILEPATH: process.env.TRACK_FILEPATH,
+      STORE_PATH: process.env.STORE_PATH,
+    });
+  }
+  createWindow();
+  installExtensions();
+});
+
+app.on("will-quit", () => {
+  if (pythonProcess) {
+    pythonProcess.kill();
+  }
+});

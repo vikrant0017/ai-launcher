@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import dotenv from "dotenv";
 import registerListeners from "./helpers/ipc/listeners-register";
 // "electron-squirrel-startup" seems broken when packaging with vite
@@ -39,6 +39,7 @@ function createWindow() {
   }
 }
 
+// main.js
 async function installExtensions() {
   try {
     const result = await installExtension(REACT_DEVELOPER_TOOLS);
@@ -104,6 +105,16 @@ function startPythonServer(
 }
 
 app.whenReady().then(() => {
+  ipcMain.handle("select-file", async function () {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ["openFile", "openDirectory"],
+      title: "Select a file",
+    });
+
+    console.log("hello", filePaths);
+    return canceled ? null : filePaths;
+  });
+
   // Only spwan the python process if explictly PYTHON_PATH env is passed
   if (process.env.PYTHON_PATH) {
     startPythonServer(process.env.PYTHON_PATH, [], {

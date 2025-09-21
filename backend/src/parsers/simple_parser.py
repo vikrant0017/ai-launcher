@@ -13,7 +13,7 @@ class SimpleMarkdownParser(Parser):
             Document(
                 content=text,
                 metadata={
-                    "filepath": str(filepath.absolute),
+                    "filepath": str(filepath.absolute()),
                     "filename": filepath.name,
                     "extension": filepath.suffix,
                 },

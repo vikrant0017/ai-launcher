@@ -1,7 +1,5 @@
 import dspy
 
-from ..retrievers.base import Retriver
-
 
 class RAGSignature(dspy.Signature):
     """Respond to the question based on the context and context only. Respond with 'No relevant sources' explicity if the context is not relevant"""
@@ -12,10 +10,11 @@ class RAGSignature(dspy.Signature):
 
 
 class RAG(dspy.Module):
-    def __init__(self, retriever: Retriver):  # Dependency Injection
+    def __init__(self, lm: dspy.LM):  # Dependency Injection
         self.respond = dspy.ChainOfThought(RAGSignature)
-        self.retriver = retriever
+        self.lm = lm
 
-    def forward(self, questions: list[str]):
-        contexts = [c.content for c in self.retriver.query(questions)[0]]
-        return self.respond(context=contexts, question=questions[0])
+    def forward(self, contexts: list[str], question: str):
+        with dspy.context(lm=self.lm):
+            result = self.respond(context=contexts, question=question)
+        return result

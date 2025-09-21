@@ -1,13 +1,4 @@
-import os
-
-import dotenv
-
 import dspy
-dotenv.load_dotenv()
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-lm = dspy.LM("gemini/gemini-2.5-flash-lite", api_key=GEMINI_API_KEY, temperature=0.5)
-dspy.configure(lm=lm)
 
 
 class ConciseAnswer(dspy.Signature):
@@ -17,10 +8,22 @@ class ConciseAnswer(dspy.Signature):
     answer = dspy.OutputField()
 
 
-qa = dspy.Predict(ConciseAnswer)
+class AIAssitant:
+    lm: dspy.LM
+    _predict: dspy.Predict
 
+    def __init__(self, lm: dspy.LM) -> None:
+        self._predict = dspy.Predict(ConciseAnswer)
+        self.lm = lm if lm is not None else lm
 
-def ask(question: str):
-    response = qa(question=question)
-    answer = response.answer
-    return answer
+    @property
+    def predict(self) -> dspy.Predict:
+        """The prediction module (immutable)."""
+        return self._predict
+
+    def ask(self, question: str) -> str:
+        with dspy.context(lm=self.lm):
+            response = self.predict(question=question)
+
+        answer = response.answer
+        return answer

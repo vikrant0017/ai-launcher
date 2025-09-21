@@ -21,6 +21,9 @@ mlartifacts
 
 # ChromaStore
 chroma/
+store/
 
 # Temporary files for development
 tmp/
+.tracked
+dev_fs/

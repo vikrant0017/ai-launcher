@@ -3,6 +3,14 @@ import { KeyboardEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ask, rag } from "@/utils/ai";
 
+declare global {
+  interface Window {
+    file: {
+      save: (text: string) => Promise<null>;
+    };
+  }
+}
+
 export function Launcher() {
   const [answer, setAnswer] = useState("");
   const [question, setQuestion] = useState("");
@@ -43,7 +51,11 @@ export function Launcher() {
       }
       case "/": {
         e.preventDefault();
-        mode == "llm" ? setMode("rag") : setMode("llm");
+        if (mode == "llm") {
+          setMode("rag");
+        } else {
+          setMode("llm");
+        }
         break;
       }
     }

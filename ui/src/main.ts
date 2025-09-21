@@ -69,42 +69,58 @@ function startPythonServer(
   pythonExecutable: string,
   args: string[] = [],
   env = {},
-) {
-  try {
-    const child = spawn(pythonExecutable, args, {
-      env: env,
-    });
-    pythonProcess = child;
-
-    child.on("error", (err) => {
-      console.error("Failed to start python process:", err);
-      pythonProcess = null;
-    });
-
-    // stdout/stderr can be null if the process fails to spawn.
-    if (child.stdout) {
-      child.stdout.on("data", (data) => {
-        console.log(`Python stdout: ${data}`);
+): Promise<void> {
+  let resolved = false; // Check if the promise has already been resolved to prevent race condtions
+  return new Promise((resolve, reject) => {
+    try {
+      const child = spawn(pythonExecutable, args, {
+        env: env,
       });
-    }
+      pythonProcess = child;
 
-    if (child.stderr) {
-      child.stderr.on("data", (data) => {
-        console.error(`Python stderr: ${data}`);
+      child.on("error", (err) => {
+        console.error("Failed to start python process:", err);
+        pythonProcess = null;
+        if (!resolved) {
+          resolved = true;
+          reject(err);
+        }
       });
-    }
 
-    child.on("close", (code) => {
-      console.log(`Python process exited with code ${code}`);
+      // stdout/stderr can be null if the process fails to spawn.
+      if (child.stdout) {
+        child.stdout.on("data", (data) => {
+          console.log(`Python stdout: ${data}`);
+        });
+      }
+
+      if (child.stderr) {
+        child.stderr.on("data", (data: string) => {
+          if (data.includes("Uvicorn running on")) {
+            console.log("Python server started successfully");
+            resolved = true;
+            resolve();
+          }
+          console.error(`Python stderr: ${data}`);
+        });
+      }
+
+      child.on("close", (code) => {
+        console.log(`Python process exited with code ${code}`);
+        pythonProcess = null;
+      });
+    } catch (err) {
+      console.error("Error spawning python process:", err);
       pythonProcess = null;
-    });
-  } catch (err) {
-    console.error("Error spawning python process:", err);
-    pythonProcess = null;
-  }
+      if (!resolved) {
+        resolved = true;
+        reject(err);
+      }
+    }
+  });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   ipcMain.handle("select-file", async function () {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       properties: ["openFile", "openDirectory"],
@@ -117,14 +133,21 @@ app.whenReady().then(() => {
 
   // Only spwan the python process if explictly PYTHON_PATH env is passed
   if (process.env.PYTHON_PATH) {
-    startPythonServer(process.env.PYTHON_PATH, [], {
-      WATCH_DIR: process.env.WATCH_DIR,
-      TRACK_FILEPATH: process.env.TRACK_FILEPATH,
-      STORE_PATH: process.env.STORE_PATH,
-    });
+    try {
+      await startPythonServer(process.env.PYTHON_PATH, [], {
+        PYTHON_ENV: "production",
+      });
+      createWindow();
+      installExtensions();
+    } catch (error) {
+      console.error("Failed to start python srever", error);
+      dialog.showErrorBox("Backend Error", error.message);
+      app.quit();
+    }
+  } else {
+    createWindow();
+    installExtensions();
   }
-  createWindow();
-  installExtensions();
 });
 
 app.on("will-quit", () => {

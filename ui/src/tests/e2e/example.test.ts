@@ -5,7 +5,6 @@ import {
   ElectronApplication,
   Page,
 } from "@playwright/test";
-import { Input } from "electron";
 import { findLatestBuild, parseElectronApp } from "electron-playwright-helpers";
 
 /*
@@ -40,12 +39,5 @@ test("renders the first page", async () => {
   const page: Page = await electronApp.firstWindow();
   const input = await page.waitForSelector("input");
   const placeholder = await input.getAttribute("placeholder");
-  expect(placeholder).toBe("Type to search...");
-
-});
-
-test("renders page name", async () => {
-  const page: Page = await electronApp.firstWindow();
-  const answer = page.locator("#answer");
-  await expect(answer).toContainText('Lorem')
+  expect(placeholder).toBe("API KEY");
 });

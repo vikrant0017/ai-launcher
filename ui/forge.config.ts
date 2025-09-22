@@ -10,11 +10,12 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    extraResource: "../backend/dist/server", // goes to <appname>/resources/server
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
-    new MakerZIP({}, ["linux"]),
+    // new MakerSquirrel({}),
+    new MakerZIP({}, ["linux", "darwin", "win32"]),
   ],
   plugins: [
     new VitePlugin({

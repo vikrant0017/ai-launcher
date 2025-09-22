@@ -1,6 +1,5 @@
 name: Build & Release Electron
 
-
 on:
   push:
     tags:
@@ -9,24 +8,33 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./ui
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: 
+        with:
           node-version: 22
-      - name: Install Dependencies
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
+      - name: Install uv based on the config files in the working-directory
+        uses: astral-sh/setup-uv@v6
+        with:
+          working-directory: ./backend
+      - name: Install UI Dependencies
         run: npm ci
+        working-directory: ./ui
+      - name: Install Backend Dependencies
+        run: uv sync
+        working-directory: ./backend
+      - name: Package Backend using Pyisntaller
+        run: uv run -- pyinstaller server.spec
+        working-directory: ./backend
       - name: Build Electron
         run: npm run make
+        working-directory: ./ui
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            out/make/zip/linux/x64/*.zip
-            out/ai-launcher-linux-x64/**
+            ui/out/make/zip/linux/x64/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      

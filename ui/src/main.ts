@@ -132,9 +132,21 @@ app.whenReady().then(async () => {
   });
 
   // Only spwan the python process if explictly PYTHON_PATH env is passed
+  // or if the app is running as executable in production
+  let python_path;
+  if (app.isPackaged) {
+    console.log("Running packaged app");
+    python_path = path.join(process.resourcesPath, "server/server");
+  }
+  // env variable takes precedence
   if (process.env.PYTHON_PATH) {
+    python_path = process.env.PYTHON_PATH;
+  }
+
+  console.log("PYPATH", python_path);
+  if (python_path) {
     try {
-      await startPythonServer(process.env.PYTHON_PATH, [], {
+      await startPythonServer(python_path, [], {
         PYTHON_ENV: "production",
       });
       createWindow();

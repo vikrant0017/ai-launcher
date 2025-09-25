@@ -8,6 +8,7 @@ from openai import AuthenticationError
 from assistant import AIAssitant
 from config import app_config
 from file_rag import RAGService
+from routers.notes import router
 from src.llm import load_gemini_lm
 
 # Global variable to hold our service instance
@@ -30,6 +31,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(router)
 
 
 def initialize_services():

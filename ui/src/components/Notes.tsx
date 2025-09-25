@@ -2,67 +2,35 @@ import React, { useState } from "react";
 import { KeyboardEvent } from "react";
 import Editor from "./Editor";
 import { Button } from "./ui/button";
-
-interface Note {
-  content: string;
-  date: string;
-  hash: string;
-  tags: Array<string>;
-}
-
-interface SequencedNote {
-  note: Note;
-  seq_no: number;
-}
+import NoteService, { SequenceNote, Note } from "../utils/notes";
 
 export default function Notes() {
   const [value, setValue] = useState("");
-  const [note, setNote] = useState<SequencedNote>();
+  const [note, setNote] = useState<SequenceNote | null>(null);
 
   const handlePrev = async () => {
     if (!note) return;
-    const response = await fetch("http://localhost:8001/notes/read", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ seq_no: note["seq_no"] - 1 }),
-    });
-
-    const jsonRes = await response.json();
-    setNote(jsonRes);
+    const noteRes = await NoteService.read_note(note.seq_no - 1);
+    if (!noteRes) return;
+    setNote(noteRes);
   };
 
   const handleNext = async () => {
     if (!note) return;
-    const response = await fetch("http://localhost:8001/notes/read", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ seq_no: note.seq_no + 1 }),
-    });
-    const jsonRes = await response.json();
-    setNote(jsonRes);
+    const noteRes = await NoteService.read_note(note.seq_no + 1);
+    if (!noteRes) return;
+    setNote(noteRes);
   };
 
   const handleKeyPress = async (e: KeyboardEvent<HTMLElement>) => {
     if (e.ctrlKey && e.key == "Enter") {
       e.preventDefault();
-      const response = await fetch("http://localhost:8001/notes/write", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content: value }),
-      });
-      if (response.status == 200) {
-        const jsonRes = await response.json();
-        setNote(jsonRes);
-        setValue("");
-      }
+      const note = await NoteService.save_note(value);
+      setNote(note);
+      setValue("");
     }
   };
+
   return (
     <div>
       <Editor
@@ -76,11 +44,13 @@ export default function Notes() {
       >
         <div className="text-lg text-gray-100">{note && note.note.content}</div>
         <div className="text-sm font-medium text-gray-400">
-          {note && new Date(note.note.datetime).toLocaleString()}
+          {note?.note?.datetime &&
+            new Date(note.note.datetime).toLocaleString()}
         </div>
         <div className="flex flex-wrap gap-2">
           {note &&
-            note.note.tags.map((tag, index) => (
+            note?.note?.tags &&
+            note?.note?.tags.map((tag, index) => (
               <span
                 key={index}
                 className="rounded-full border border-blue-700/50 bg-blue-900/50 px-3 py-1 text-xs text-blue-300"

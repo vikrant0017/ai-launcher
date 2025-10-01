@@ -22,14 +22,20 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
 
   useEffect(() => {
     const fetchConfig = async () => {
-      const response = await fetch("http://localhost:8001/config", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const jsonResponse = await response.json();
-      setApiKey(jsonResponse.gemini_api_key);
-      setWatchDir(jsonResponse.watch_dir);
+      try {
+        const response = await fetch("http://localhost:8001/config", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const jsonResponse = await response.json();
+        setApiKey(jsonResponse.gemini_api_key);
+        setWatchDir(jsonResponse.watch_dir);
+      } catch (error) {
+        console.error("Error fetching config", error);
+        setApiKey("");
+        setWatchDir("");
+      }
     };
     fetchConfig();
   }, []); // Runs only once

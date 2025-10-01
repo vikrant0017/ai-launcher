@@ -43,7 +43,7 @@ export const Route: React.FC<RouteProps> = ({ children, route }) => {
 export const useRoute = () => {
   const context = useContext(RouteContext);
   if (context == null) {
-    console.error("component must be inside RouterProvider");
+    throw new Error("Component must be inside ConfigProvider");
   }
   return context;
 };

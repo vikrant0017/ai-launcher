@@ -8,7 +8,7 @@ interface Context {
 const RouteContext = createContext<Context | undefined>(undefined);
 
 type RouteProviderProps = {
-  children: Array<React.ReactElement>;
+  children: React.ReactElement<RouteProps>;
   currentRoute: string;
   onRouteChange: (route: string) => void;
 };
@@ -19,7 +19,11 @@ export default function RouteProvider({
   onRouteChange,
 }: RouteProviderProps) {
   const routeChild = React.Children.toArray(children).filter((child) => {
-    return child.props.route === currentRoute;
+    return (
+      React.isValidElement(child) &&
+      (child.props as RouteProps).route &&
+      (child.props as RouteProps).route === currentRoute
+    );
   });
   return (
     <RouteContext.Provider

@@ -28,7 +28,7 @@ function createWindow() {
       preload: preload,
     },
     // In Hyprland environment, resizable must be set to false to prevent auto-tiling
-    resizable: inDevelopment ? true : false, // During dev its difficult to work if it overlaps in center
+    resizable: !!inDevelopment, // During dev its difficult to work if it overlaps in center
     movable: false, // [darwin, win32]
     titleBarStyle: "hidden",
   });

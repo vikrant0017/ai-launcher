@@ -1,44 +1,50 @@
-import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Launcher } from "@/components/Launcher";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Preferences from "./components/Preferences";
-import { ConfigProvider, useConfig } from "./components/ConfigProvider";
-
-const SimpleRouter = () => {
-  // Comopnent rerenders on context value change
-  const { apiKey, watchDir, setApiKey, setWatchDir } = useConfig();
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const fetchConfig = async () => {
-      const response = await fetch("http://localhost:8001/config", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const jsonResponse = await response.json();
-      setApiKey(jsonResponse.gemini_api_key);
-      setWatchDir(jsonResponse.watch_dir);
-      setIsLoading(false);
-    };
-    fetchConfig();
-  }, []); // Runs only once
-  console.log("Count");
-
-  if (isLoading) {
-    return <div>Loading Configuration...</div>;
-  }
-
-  return apiKey && watchDir ? <Launcher /> : <Preferences />;
-};
+import { ConfigProvider } from "./components/ConfigProvider";
+import RouteProvider, { Route } from "./components/RouteProvider";
+import ActionBar from "./components/ActionBar";
 
 const App = () => {
+  const [route, setRoute] = useState("/launcher");
+  const navItems = {
+    ai: "AI",
+  };
+  const navItemsRoute: Record<string, string> = {
+    ai: "/launcher",
+  };
+
+  const handleButtonClick = () => {
+    setRoute("/preferences");
+  };
+
+  const handleNavItemChange = (val: string) => {
+    setRoute(navItemsRoute[val]);
+  };
+
   return (
-    <ConfigProvider>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <SimpleRouter />
-      </ThemeProvider>
-    </ConfigProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ConfigProvider>
+        <div className="flex h-screen flex-col justify-between">
+          <RouteProvider currentRoute={route} onRouteChange={setRoute}>
+            <Route route="/launcher">
+              <Launcher />
+            </Route>
+            <Route route="/preferences">
+              <Preferences />
+            </Route>
+          </RouteProvider>
+          <div className="border-t-1">
+            <ActionBar
+              navItems={navItems}
+              onButtonClick={handleButtonClick}
+              onNavItemChange={handleNavItemChange}
+            />
+          </div>
+        </div>
+      </ConfigProvider>
+    </ThemeProvider>
   );
 };
 

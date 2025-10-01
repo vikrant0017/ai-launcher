@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useConfig } from "./ConfigProvider";
+import { useRoute } from "./RouteProvider";
 
 declare global {
   interface Window {
@@ -19,6 +20,8 @@ const Preferences = () => {
   const [watchDir, setWatchDir] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [selectingFile, setSelectingFile] = useState(false);
+
+  const { setRoute } = useRoute();
 
   useEffect(() => {
     setApiKey(config.apiKey);
@@ -65,13 +68,14 @@ const Preferences = () => {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
+      <h1 className="scroll-m-20 text-center text-3xl font-extrabold tracking-tight text-balance">
         Preferences
       </h1>
       <div>
         <Label htmlFor="api-key">Gemini API KEY</Label>
         <Input
           id="api-key"
+          type="text"
           placeholder="API KEY"
           value={apiKey}
           onChange={(e) => {
@@ -87,6 +91,7 @@ const Preferences = () => {
       <div className="grid w-full max-w-sm items-center gap-3">
         <Label htmlFor="select-dir">Watch Dir</Label>
         <Input
+          type="text"
           value={watchDir}
           id="select-dir"
           style={{ caretColor: "transparent" }}
@@ -98,10 +103,12 @@ const Preferences = () => {
         )}
       </div>
       <Button
+        id="preferences-btn"
         className="self-center"
         onClick={() => {
           console.log(apiKey, watchDir);
           setRemoteConfig();
+          setRoute("/launcher");
         }}
       >
         Close

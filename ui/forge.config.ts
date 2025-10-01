@@ -10,7 +10,6 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    extraResource: "../backend/dist/server", // goes to <appname>/resources/server
   },
   rebuildConfig: {},
   makers: [

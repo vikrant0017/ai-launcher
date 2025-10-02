@@ -8,7 +8,7 @@ interface Context {
 const RouteContext = createContext<Context | undefined>(undefined);
 
 type RouteProviderProps = {
-  children: React.ReactElement<RouteProps>;
+  children: React.ReactElement<RouteProps>[];
   currentRoute: string;
   onRouteChange: (route: string) => void;
 };

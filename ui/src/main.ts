@@ -15,17 +15,21 @@ const inDevelopment = process.env.NODE_ENV === "development";
 
 function createWindow() {
   const preload = path.join(__dirname, "preload.js");
+
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    // Make width and height values dynamic based on screen sizes and resolution
+    width: 600,
+    height: 400,
     webPreferences: {
       devTools: inDevelopment,
       contextIsolation: true,
       nodeIntegration: true,
       nodeIntegrationInSubFrames: false,
-
       preload: preload,
     },
+    // In Hyprland environment, resizable must be set to false to prevent auto-tiling
+    resizable: !!inDevelopment, // During dev its difficult to work if it overlaps in center
+    movable: false, // [darwin, win32]
     titleBarStyle: "hidden",
   });
   registerListeners(mainWindow);
@@ -37,6 +41,8 @@ function createWindow() {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
+
+  return mainWindow;
 }
 
 // main.js
@@ -127,14 +133,13 @@ app.whenReady().then(async () => {
       title: "Select a file",
     });
 
-    console.log("hello", filePaths);
     return canceled ? null : filePaths;
   });
 
   // Only spwan the python process if explictly PYTHON_PATH env is passed
   // or if the app is running as executable in production
   let python_path;
-  if (app.isPackaged) {
+  if (!process.defaultApp) {
     console.log("Running packaged app");
     python_path = path.join(process.resourcesPath, "server/server");
   }
@@ -157,7 +162,8 @@ app.whenReady().then(async () => {
       app.quit();
     }
   } else {
-    createWindow();
+    const win = createWindow();
+    win.center();
     installExtensions();
   }
 });

@@ -1,5 +1,5 @@
 "use strict";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 export type Config = {
   apiKey: string;
@@ -19,6 +19,26 @@ type ConfigProviderProps = {
 export function ConfigProvider({ children }: ConfigProviderProps) {
   const [apiKey, setApiKey] = React.useState("");
   const [watchDir, setWatchDir] = React.useState("");
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const response = await fetch("http://localhost:8001/config", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const jsonResponse = await response.json();
+        setApiKey(jsonResponse.gemini_api_key);
+        setWatchDir(jsonResponse.watch_dir);
+      } catch (error) {
+        console.error("Error fetching config", error);
+        setApiKey("");
+        setWatchDir("");
+      }
+    };
+    fetchConfig();
+  }, []); // Runs only once
 
   return (
     <div className={apiKey}>

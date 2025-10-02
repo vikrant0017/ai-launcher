@@ -65,7 +65,8 @@ export function Launcher() {
     <div className="text-2xl">
       <div>
         <Input
-          className="h-15 border-none pl-8 outline-none [&]:text-xl [&:focus]:ring-0"
+          type="search"
+          className="!bg-background border-round focus-visible:border-ring-none h-15 rounded-none border-0 border-b-1 pl-8 outline-none [&]:text-xl [&:focus]:ring-0"
           value={question}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}

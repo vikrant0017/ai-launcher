@@ -7,7 +7,8 @@
   "private": true,
   "scripts": {
     "start": "electron-forge start",
-    "package": "electron-forge package",
+    "package": "NODE_ENV='production' electron-forge package",
+    "package:test": "NODE_ENV='test' electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint .",

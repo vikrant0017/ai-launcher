@@ -7,10 +7,16 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
+const nodeEnv = process.env.NODE_ENV || "development";
+const isTest = nodeEnv === "test";
+const isDev = nodeEnv === "development";
+const isProd = nodeEnv === "production";
+
+console.log("ELECTRON PACKAGING ENVIROMENT", nodeEnv);
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    extraResource: "../backend/dist/server", // goes to <appname>/resources/server
+    ...(isProd ? { extraResource: "../backend/dist/server" } : {}), // gos to <appname>/resources/server
   },
   rebuildConfig: {},
   makers: [

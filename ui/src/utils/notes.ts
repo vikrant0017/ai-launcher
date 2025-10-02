@@ -30,7 +30,7 @@ export interface Note {
 
 export interface SequenceNote {
   note: Note;
-  seq_no: -1;
+  seq_no: number;
 }
 
 // Exposes the api via static methods. SInce the logic is in the server side
@@ -39,7 +39,7 @@ export interface SequenceNote {
 export default class NoteService {
   constructor() {}
 
-  static async save_note(content: string) {
+  static async save_note(content: string): Promise<SequenceNote | null> {
     const response = await fetchJson(NOTES_PATH + "/write", { content });
     return response;
   }
@@ -51,5 +51,3 @@ export default class NoteService {
     return response;
   }
 }
-
-

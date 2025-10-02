@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { KeyboardEvent } from "react";
 import Editor from "./Editor";
 import { Button } from "./ui/button";
@@ -7,6 +6,7 @@ import NoteService, { SequenceNote, Note } from "../utils/notes";
 export default function Notes() {
   const [value, setValue] = useState("");
   const [note, setNote] = useState<SequenceNote | null>(null);
+  const [lenNotes, setLenNotes] = useState(0);
 
   const handlePrev = async () => {
     if (!note) return;
@@ -27,17 +27,13 @@ export default function Notes() {
       e.preventDefault();
       const note = await NoteService.save_note(value);
       setNote(note);
+      setLenNotes(note?.seq_no ? note.seq_no + 1 : 0);
       setValue("");
     }
   };
 
-  return (
-    <div>
-      <Editor
-        value={value}
-        onValueChange={setValue}
-        onKeyDown={handleKeyPress}
-      />
+  const renderNotesViewer = () => (
+    <>
       <div
         className="space-y-6 border border-gray-700 bg-gray-900 p-6 pl-8 leading-7 text-gray-100 [&:not(:first-child)]:mt-6"
         id="notes"
@@ -62,18 +58,31 @@ export default function Notes() {
       </div>
       <div className="mt-6 flex justify-between px-8">
         <Button
+          disabled={note?.seq_no == 0}
           onClick={handlePrev}
           className="border-gray-600 bg-gray-700 text-gray-100 hover:bg-gray-600"
         >
           Prev
         </Button>
         <Button
+          disabled={note?.seq_no == lenNotes - 1}
           onClick={handleNext}
           className="border-gray-600 bg-gray-700 text-gray-100 hover:bg-gray-600"
         >
           Next
         </Button>
       </div>
+    </>
+  );
+
+  return (
+    <div>
+      <Editor
+        value={value}
+        onValueChange={setValue}
+        onKeyDown={handleKeyPress}
+      />
+      {!!lenNotes && renderNotesViewer()}
     </div>
   );
 }

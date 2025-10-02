@@ -7,8 +7,8 @@
   "private": true,
   "scripts": {
     "start": "electron-forge start",
-    "package": "NODE_ENV='production' electron-forge package",
-    "package:test": "NODE_ENV='test' electron-forge package",
+    "package": "cross-env NODE_ENV='production' electron-forge package",
+    "package:test": "cross-env NODE_ENV='test' electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint .",
@@ -44,6 +44,7 @@
     "@types/node": "^22.17.0",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
+    "cross-env": "^10.1.0",
     "electron": "^37.2.5",
     "electron-devtools-installer": "^4.0.0",
     "electron-playwright-helpers": "^1.7.1",

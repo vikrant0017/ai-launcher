@@ -1,3 +1,4 @@
+import React, { useRef, useState } from "react";
 import { KeyboardEvent } from "react";
 import Editor from "./Editor";
 import { Button } from "./ui/button";

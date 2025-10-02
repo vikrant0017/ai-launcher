@@ -1,4 +1,5 @@
 import React, { KeyboardEvent } from "react";
+import DOMPurify from "isomorphic-dompurify";
 
 const highlightText = (text: string) => {
   const combinedRegex = /(https?:\/\/[^\s]+)|(#["\w-]+)/g;
@@ -52,7 +53,9 @@ const Editor: React.FC<EditorProps> = ({ value, onValueChange, onKeyDown }) => {
       />
       <div
         className={`${sharedClasses} text-foreground pointer-events-none z-0`}
-        dangerouslySetInnerHTML={{ __html: highlightText(value) + " " }} // Trailing space ensures last line is rendered and div grows
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(highlightText(value) + " "),
+        }} // Trailing space ensures last line is rendered and div grows
       />
     </div>
   );

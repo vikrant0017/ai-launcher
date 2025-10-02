@@ -1,10 +1,9 @@
 from pathlib import Path
 
-from fastapi import APIRouter
-from fastapi.requests import Request
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
-from notes.notes import NoteService
+from notes.notes import InvalidSequenceNoError, NoteService
 
 note_service = NoteService(Path("/home/vikrant/Notes/__Fleeting Notes"))
 
@@ -14,21 +13,32 @@ router = APIRouter(
 )
 
 
+class ReadNoteRequest(BaseModel):
+    seq_no: int | None = None
+
+
+class WriteNoteRequest(BaseModel):
+    content: str | None = None
+
+
 @router.post("/read")
-async def read_note(req: Request):
-    req = await req.json()
-    seq_no = req.get("seq_no", None)
-    content = note_service.read_note(seq_no=seq_no)
+async def read_note(req: ReadNoteRequest):
+    try:
+        content = note_service.read_note(seq_no=req.seq_no)
+    except InvalidSequenceNoError:
+        raise HTTPException(
+            status_code=404,
+            detail={"success": False, "error": "Invalid Sequence Number"},
+        )
+
     return content
 
 
 @router.post("/write")
-async def write_note(req: Request):
-    note = await req.json()
-    if not note.get("content"):
-        return JSONResponse(
-            content={"success": False, "error": "Invalid JSON Format"},
+async def write_note(req: WriteNoteRequest):
+    if not req.content:
+        raise HTTPException(
             status_code=401,
+            detail={"success": False, "error": "Content field cannot be empty"},
         )
-    content = note["content"]
-    return note_service.add_note(content)
+    return note_service.add_note(req.content)

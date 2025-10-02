@@ -6,6 +6,10 @@ from pathlib import Path
 from pprint import pprint as print
 
 
+class InvalidSequenceNoError(Exception):
+    pass
+
+
 @dataclass
 class Note:
     content: str
@@ -73,7 +77,7 @@ class NoteService:
         filepath = self.save_dir / self.current_file
         try:
             with filepath.open("a", encoding="utf-8") as f:
-                f.write(content)
+                _ = f.write(content)
         except FileNotFoundError as e:
             raise e
 
@@ -91,4 +95,8 @@ class NoteService:
         if seq_no is None:
             seq_no = len(file_contents) - 1
 
-        return SequencedNote(note=self.parse(file_contents[seq_no]), seq_no=seq_no)
+        try:
+            file_content = file_contents[seq_no]
+            return SequencedNote(note=self.parse(file_contents[seq_no]), seq_no=seq_no)
+        except IndexError as e:
+            raise InvalidSequenceNoError("Invalid seq no") from e

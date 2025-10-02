@@ -37,7 +37,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Create Executable
-        run: npm run package # Playright requires the executable
+        run: npm run package:test # Playright requires the executable
       - name: Run Playwright tests
         run: npm run test:e2e
       - uses: actions/upload-artifact@v4

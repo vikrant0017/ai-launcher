@@ -5,14 +5,17 @@ import Preferences from "./components/Preferences";
 import { ConfigProvider } from "./components/ConfigProvider";
 import RouteProvider, { Route } from "./components/RouteProvider";
 import ActionBar from "./components/ActionBar";
+import Notes from "./components/Notes";
 
 const App = () => {
   const [route, setRoute] = useState("/launcher");
   const navItems = {
     ai: "AI",
+    notes: "Notes",
   };
   const navItemsRoute: Record<string, string> = {
     ai: "/launcher",
+    notes: "/notes",
   };
 
   const handleButtonClick = () => {
@@ -33,6 +36,9 @@ const App = () => {
             </Route>
             <Route route="/preferences">
               <Preferences />
+            </Route>
+            <Route route="/notes">
+              <Notes />
             </Route>
           </RouteProvider>
           <div className="border-t-1">

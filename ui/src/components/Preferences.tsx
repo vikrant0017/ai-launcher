@@ -121,7 +121,7 @@ const Preferences = () => {
           id="select-dir"
           className="focus-visible:border-ring-none cursor-pointer caret-transparent [&:focus]:ring-0"
           onSelect={handleDirSelect}
-          placeholder="Chose Dir"
+          placeholder="Select Watch Dir"
         ></Input>
       </div>
       <div className="grid w-full max-w-sm items-center gap-3">
@@ -129,10 +129,10 @@ const Preferences = () => {
         <Input
           type="text"
           value={notesDir}
-          id="select-dir"
+          id="watch-dir"
           className="focus-visible:border-ring-none cursor-pointer caret-transparent [&:focus]:ring-0"
           onSelect={handleNotesDirSelect}
-          placeholder="Chose Dir"
+          placeholder="Select Notes Dir"
         ></Input>
       </div>
       <Button

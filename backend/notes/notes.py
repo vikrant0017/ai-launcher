@@ -29,7 +29,7 @@ class NoteService:
         if not save_dir.exists():
             save_dir.mkdir(parents=True)
 
-        self.save_dir = save_dir
+        self.save_dir = save_dir  # config
         self.current_file = "fleeting_notes.md"
 
     def format(self, note: Note) -> str:

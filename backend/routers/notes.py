@@ -1,15 +1,23 @@
-from pathlib import Path
-
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from notes.notes import InvalidSequenceNoError, NoteService
 
-note_service = NoteService(Path("/home/vikrant/Notes/__Fleeting Notes"))
+note_service: NoteService | None = None
+
+
+def check_note_service():
+    if not note_service:
+        raise HTTPException(
+            status_code=409,  # 409 Conflict is a good choice here
+            detail="Note service is not configured. Please set the notes directory in the settings.",
+        )
+
 
 router = APIRouter(
     prefix="/notes",
     tags=["notes"],  # Groups routes in OpenAPI docs
+    dependencies=[Depends(check_note_service)],
 )
 
 

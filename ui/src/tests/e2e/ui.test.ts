@@ -36,7 +36,6 @@ test.beforeAll(async () => {
 
     // This is requested at app startup internally
     await page.route("http://localhost:8001/config", async (route) => {
-      console.log("Method", route.request());
       route.fulfill({
         status: 200,
         contentType: "application/json",

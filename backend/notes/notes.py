@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from hashlib import sha256
 from pathlib import Path
-from pprint import pprint as print
 
 
 class InvalidSequenceNoError(Exception):
@@ -47,7 +46,6 @@ class NoteService:
 
     def parse(self, note_str: str) -> Note:
         note_lines = note_str.split("\n")
-        print(note_lines)
 
         return Note(
             datetime=datetime.fromisoformat(note_lines[1]),

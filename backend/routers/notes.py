@@ -1,0 +1,52 @@
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+
+from notes.notes import InvalidSequenceNoError, NoteService
+
+note_service: NoteService | None = None
+
+
+def check_note_service():
+    if not note_service:
+        raise HTTPException(
+            status_code=409,  # 409 Conflict is a good choice here
+            detail="Note service is not configured. Please set the notes directory in the settings.",
+        )
+
+
+router = APIRouter(
+    prefix="/notes",
+    tags=["notes"],  # Groups routes in OpenAPI docs
+    dependencies=[Depends(check_note_service)],
+)
+
+
+class ReadNoteRequest(BaseModel):
+    seq_no: int | None = None
+
+
+class WriteNoteRequest(BaseModel):
+    content: str | None = None
+
+
+@router.post("/read")
+async def read_note(req: ReadNoteRequest):
+    try:
+        content = note_service.read_note(seq_no=req.seq_no)
+    except InvalidSequenceNoError:
+        raise HTTPException(
+            status_code=404,
+            detail={"success": False, "error": "Invalid Sequence Number"},
+        )
+
+    return content
+
+
+@router.post("/write")
+async def write_note(req: WriteNoteRequest):
+    if not req.content:
+        raise HTTPException(
+            status_code=401,
+            detail={"success": False, "error": "Content field cannot be empty"},
+        )
+    return note_service.add_note(req.content)

@@ -18,6 +18,7 @@ declare global {
 const Preferences = () => {
   const config = useConfig();
   const [watchDir, setWatchDir] = useState("");
+  const [notesDir, setNotesDir] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [selectingFile, setSelectingFile] = useState(false);
 
@@ -30,6 +31,28 @@ const Preferences = () => {
   useEffect(() => {
     setWatchDir(config.watchDir);
   }, [config.watchDir]);
+
+  useEffect(() => {
+    setNotesDir(config.notesDir);
+  }, [config.notesDir]);
+
+  const handleNotesDirSelect = async (
+    e: React.SyntheticEvent<HTMLInputElement>,
+  ) => {
+    e.preventDefault();
+
+    // Process only one call to file selecting at a time
+    if (selectingFile) {
+      return;
+    }
+
+    setSelectingFile(true);
+    const dirPath = await window.widgets.selectFile();
+    setSelectingFile(false);
+    if (dirPath && dirPath.length > 0) {
+      setNotesDir(dirPath[0]);
+    }
+  };
 
   const handleDirSelect = async (e: React.SyntheticEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -56,6 +79,7 @@ const Preferences = () => {
       body: JSON.stringify({
         gemini_api_key: apiKey,
         watch_dir: watchDir,
+        notes_dir: notesDir,
       }),
     });
 
@@ -64,6 +88,7 @@ const Preferences = () => {
 
     config.setApiKey(apiKey);
     config.setWatchDir(watchDir);
+    config.setNotesDir(notesDir);
   };
 
   return (
@@ -89,18 +114,26 @@ const Preferences = () => {
         />
       </div>
       <div className="grid w-full max-w-sm items-center gap-3">
-        <Label htmlFor="select-dir">Watch Dir</Label>
+        <Label htmlFor="select-dir">Watch Directory</Label>
         <Input
           type="text"
           value={watchDir}
           id="select-dir"
-          style={{ caretColor: "transparent" }}
+          className="focus-visible:border-ring-none cursor-pointer caret-transparent [&:focus]:ring-0"
           onSelect={handleDirSelect}
-          placeholder="Select Watch Directory"
+          placeholder="Select Watch Dir"
         ></Input>
-        {watchDir && (
-          <p className="text-sm text-gray-500">Watching: {watchDir}</p>
-        )}
+      </div>
+      <div className="grid w-full max-w-sm items-center gap-3">
+        <Label htmlFor="select-dir">Notes Directory</Label>
+        <Input
+          type="text"
+          value={notesDir}
+          id="watch-dir"
+          className="focus-visible:border-ring-none cursor-pointer caret-transparent [&:focus]:ring-0"
+          onSelect={handleNotesDirSelect}
+          placeholder="Select Notes Dir"
+        ></Input>
       </div>
       <Button
         id="preferences-btn"

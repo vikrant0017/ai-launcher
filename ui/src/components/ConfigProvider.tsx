@@ -6,6 +6,8 @@ export type Config = {
   setApiKey: React.Dispatch<React.SetStateAction<string>>;
   watchDir: string;
   setWatchDir: React.Dispatch<React.SetStateAction<string>>;
+  notesDir: string;
+  setNotesDir: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const ConfigProviderContext = React.createContext<Config | undefined>(
@@ -19,6 +21,7 @@ type ConfigProviderProps = {
 export function ConfigProvider({ children }: ConfigProviderProps) {
   const [apiKey, setApiKey] = React.useState("");
   const [watchDir, setWatchDir] = React.useState("");
+  const [notesDir, setNotesDir] = React.useState("");
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -31,10 +34,12 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
         const jsonResponse = await response.json();
         setApiKey(jsonResponse.gemini_api_key);
         setWatchDir(jsonResponse.watch_dir);
+        setNotesDir(jsonResponse.notes_dir);
       } catch (error) {
         console.error("Error fetching config", error);
         setApiKey("");
         setWatchDir("");
+        setNotesDir("");
       }
     };
     fetchConfig();
@@ -43,7 +48,14 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
   return (
     <div className={apiKey}>
       <ConfigProviderContext.Provider
-        value={{ apiKey, setApiKey, watchDir, setWatchDir }}
+        value={{
+          apiKey,
+          setApiKey,
+          watchDir,
+          setWatchDir,
+          notesDir,
+          setNotesDir,
+        }}
       >
         {children}
       </ConfigProviderContext.Provider>

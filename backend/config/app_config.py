@@ -26,11 +26,13 @@ class AppConfig:
         data_dir: str,
         config_dir: str,
         watch_dir: str | None,
+        notes_dir: str | None,
         gemini_api_key: str | None,
     ) -> None:
         self.data_dir = data_dir
         self.config_dir = config_dir
         self.watch_dir = watch_dir
+        self.notes_dir = notes_dir
         self.gemini_api_key = gemini_api_key
 
     @classmethod
@@ -42,6 +44,7 @@ class AppConfig:
             data_dir=json_obj["data_dir"],
             config_dir=json_obj["config_dir"],
             watch_dir=json_obj.get("watch_dir", None),
+            notes_dir=json_obj.get("notes_dir", None),
             gemini_api_key=json_obj.get("gemini_api_key", None),
         )
 
@@ -92,6 +95,7 @@ def load_app_config():
             data_dir=str(data_dir),
             config_dir=str(config_dir),
             watch_dir=None,  # User will set in production
+            notes_dir=None,  # User will set in production
             gemini_api_key=None,
         )
 
@@ -117,6 +121,7 @@ def load_app_config():
             data_dir=str(data_dir),
             config_dir=str(config_dir),
             watch_dir=str(watch_dir),
+            notes_dir=None,  # User will set in production
             gemini_api_key=None,
         )
 

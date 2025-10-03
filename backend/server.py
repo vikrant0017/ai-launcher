@@ -5,9 +5,12 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from openai import AuthenticationError
 
+import routers.notes as notes_router
 from assistant import AIAssitant
 from config import app_config
 from file_rag import RAGService
+from notes.notes import NoteService
+from routers.notes import router
 from src.llm import load_gemini_lm
 
 # Global variable to hold our service instance
@@ -30,14 +33,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(router)
 
 
 def initialize_services():
     """Loads config and initializes the RAG service if configured."""
-    global rag_service, ai_assitant, app_config
+    global rag_service, ai_assitant, app_config, note_service
     # Reload config from file in case it changed
 
-    print(app_config)
     if app_config.watch_dir:
         print("Watch directory is configured. Initializing RAG service.")
         rag_service = RAGService(
@@ -52,6 +55,13 @@ def initialize_services():
         ai_assitant = AIAssitant(lm=load_gemini_lm())
     else:
         print("LLM API KEY not configured")
+
+    if app_config.notes_dir:
+        print("Notes directory is configured. Initializing Notes service.")
+        notes_router.note_service = NoteService(Path(app_config.notes_dir))
+    else:
+        print("Notes directory not configured. Note service will not be started.")
+        notes_router.note_service = None
 
 
 @app.get("/")

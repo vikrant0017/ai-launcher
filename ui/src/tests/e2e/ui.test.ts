@@ -36,12 +36,12 @@ test.beforeAll(async () => {
 
     // This is requested at app startup internally
     await page.route("http://localhost:8001/config", async (route) => {
-      console.log("Method", route.request());
       route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
           watch_dir: "/testdir",
+          notes_dir: "/notesdir",
           gemini_api_key: "ABC",
         }),
       });
@@ -64,6 +64,9 @@ test("Loads and shows default config values in Preferences page", async () => {
   await expect(page.getByPlaceholder("API KEY")).toHaveValue("ABC");
   await expect(page.getByPlaceholder("Select Watch Dir")).toHaveValue(
     "/testdir",
+  );
+  await expect(page.getByPlaceholder("Select Notes Dir")).toHaveValue(
+    "/notesdir",
   );
   // Gets back to laucher when closed
   await page.getByRole("button", { name: "Close" }).click();

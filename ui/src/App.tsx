@@ -6,6 +6,7 @@ import { ConfigProvider } from "./components/ConfigProvider";
 import RouteProvider, { Route } from "./components/RouteProvider";
 import ActionBar from "./components/ActionBar";
 import Notes from "./components/Notes";
+import { useShortcut } from "@/hooks";
 
 const App = () => {
   const [route, setRoute] = useState("/launcher");
@@ -14,51 +15,30 @@ const App = () => {
     notes: "Notes",
   };
 
-  useEffect(() => {
-    const changeModeHandler = (e: KeyboardEvent) => {
-      const accelerator = `${e.ctrlKey ? "Ctrl-" : ""}${e.shiftKey ? "Shift-" : ""}${e.key.toUpperCase()}`;
-      // e.stopPropagation();
-      console.log("(App)" + accelerator);
-      switch (accelerator) {
-        case "Ctrl-N": {
-          console.log("Changing mode to Notes");
-          setRoute("/notes");
-          break;
-        }
-        case "Ctrl-I": {
-          console.log("Changing mode to AI");
-          setRoute("/launcher");
-          break;
-        }
-        case "Ctrl-P": {
-          console.log("Opening Preferences");
-          setRoute("/preferences");
-          break;
-        }
-        case "Ctrl-A": {
-          const target = e.target;
-          if (target instanceof HTMLElement && target?.tagName != "INPUT") {
-            e.preventDefault();
-          }
-          console.log("Selcting");
-          break;
-        }
-        case "ESCAPE": {
-          const target = e.target;
-          if (target instanceof HTMLElement && target?.tagName === "INPUT") {
-            target.blur();
-          }
-          console.log("Escaping");
-          break;
-        }
-      }
-    };
+  useShortcut("Ctrl-N", () => {
+    setRoute("/notes");
+  });
+  useShortcut("Ctrl-I", () => {
+    setRoute("/launcher");
+  });
 
-    window.addEventListener("keydown", changeModeHandler);
+  useShortcut("Ctrl-P", () => {
+    setRoute("/preferences");
+  });
 
-    // Clean up during unmounting
-    return () => window.removeEventListener("keydown", changeModeHandler);
-  }, []);
+  useShortcut("Ctrl-A", (e) => {
+    const target = e.target;
+    if (target instanceof HTMLElement && target?.tagName != "INPUT") {
+      e.preventDefault();
+    }
+  });
+
+  useShortcut("ESCAPE", (e) => {
+    const target = e.target;
+    if (target instanceof HTMLElement && target?.tagName === "INPUT") {
+      target.blur();
+    }
+  });
 
   const navItemsRoute: Record<string, string> = {
     ai: "/launcher",

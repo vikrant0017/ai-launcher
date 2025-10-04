@@ -1,0 +1,1 @@
+export { useShortcut } from "./useShortcut";

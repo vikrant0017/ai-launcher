@@ -3,6 +3,7 @@ import { KeyboardEvent } from "react";
 import Editor from "./Editor";
 import { Button } from "./ui/button";
 import NoteService, { SequenceNote, Note } from "../utils/notes";
+import { useShortcut } from "@/hooks";
 
 export default function Notes() {
   const [value, setValue] = useState("");
@@ -11,6 +12,10 @@ export default function Notes() {
   const prevBtn = useRef(null);
   const nextBtn = useRef(null);
   const inp = useRef<HTMLInputElement>(null);
+  const handlersRef = useRef({
+    handlePrev: async () => {},
+    handleNext: async () => {},
+  });
 
   const handlePrev = async () => {
     if (!note) return;
@@ -26,37 +31,32 @@ export default function Notes() {
     setNote(noteRes);
   };
 
-  useEffect(() => {
-    const prevHandler = (e: KeyboardEvent) => {
-      e.stopPropagation();
-      console.log("(Notes)", e.key);
-      if (e.key == "ArrowLeft") {
-        console.log("go to prev note");
-        handlePrev();
-        // prevBtn.current.click();
-      }
-      if (e.key == "ArrowRight") {
-        console.log("go to prev note");
-        handleNext();
-        // nextBtn.current.click();
-      }
-      if (e.ctrlKey && e.key == "k") {
-        console.log("Focus on input");
-        inp?.current?.focus();
-        // nextBtn.current.click();
-      }
-      if (e.key == "Escape") {
-        console.log("Focus on input");
-        inp?.current?.blur();
-        // nextBtn.current.click();
-      }
-    };
+  // since the contents of these functions depend on state (note), useShortcut callback
+  // only runs once during mount, we need to make sure that that the event handler fucntion
+  // is not hav state closure enviroment, and using ref, like below updatres the refs with
+  // the latest callbacks with latest state valeus on every rerender
+  handlersRef.current.handleNext = handleNext;
+  handlersRef.current.handlePrev = handlePrev;
 
-    window.addEventListener("keydown", prevHandler);
+  useShortcut("ARROWLEFT", () => {
+    console.log("go to prev note");
+    handlersRef.current.handlePrev();
+  });
 
-    // Clean up during unmounting
-    return () => window.removeEventListener("keydown", prevHandler);
-  }, [handleNext, handlePrev]); // closure
+  useShortcut("ARROWRIGHT", () => {
+    console.log("go to next note");
+    handlersRef.current.handleNext();
+  });
+
+  useShortcut("Ctrl-K", () => {
+    console.log("Focus on input");
+    inp?.current?.focus();
+  });
+
+  useShortcut("ESCAPE", () => {
+    console.log("Blur input");
+    inp?.current?.blur();
+  });
 
   const handleKeyPress = async (e: KeyboardEvent<HTMLElement>) => {
     if (e.ctrlKey && e.key == "Enter") {

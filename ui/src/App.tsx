@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Launcher } from "@/components/Launcher";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Preferences from "./components/Preferences";
 import { ConfigProvider } from "./components/ConfigProvider";
 import RouteProvider, { Route } from "./components/RouteProvider";
@@ -13,6 +13,53 @@ const App = () => {
     ai: "AI",
     notes: "Notes",
   };
+
+  useEffect(() => {
+    const changeModeHandler = (e: KeyboardEvent) => {
+      const accelerator = `${e.ctrlKey ? "Ctrl-" : ""}${e.shiftKey ? "Shift-" : ""}${e.key.toUpperCase()}`;
+      // e.stopPropagation();
+      console.log("(App)" + accelerator);
+      switch (accelerator) {
+        case "Ctrl-N": {
+          console.log("Changing mode to Notes");
+          setRoute("/notes");
+          break;
+        }
+        case "Ctrl-I": {
+          console.log("Changing mode to AI");
+          setRoute("/launcher");
+          break;
+        }
+        case "Ctrl-P": {
+          console.log("Opening Preferences");
+          setRoute("/preferences");
+          break;
+        }
+        case "Ctrl-A": {
+          const target = e.target;
+          if (target instanceof HTMLElement && target?.tagName != "INPUT") {
+            e.preventDefault();
+          }
+          console.log("Selcting");
+          break;
+        }
+        case "ESCAPE": {
+          const target = e.target;
+          if (target instanceof HTMLElement && target?.tagName === "INPUT") {
+            target.blur();
+          }
+          console.log("Escaping");
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", changeModeHandler);
+
+    // Clean up during unmounting
+    return () => window.removeEventListener("keydown", changeModeHandler);
+  }, []);
+
   const navItemsRoute: Record<string, string> = {
     ai: "/launcher",
     notes: "/notes",

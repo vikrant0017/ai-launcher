@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { KeyboardEvent } from "react";
 import Editor from "./Editor";
 import { Button } from "./ui/button";
@@ -8,6 +8,9 @@ export default function Notes() {
   const [value, setValue] = useState("");
   const [note, setNote] = useState<SequenceNote | null>(null);
   const [lenNotes, setLenNotes] = useState(0);
+  const prevBtn = useRef(null);
+  const nextBtn = useRef(null);
+  const inp = useRef<HTMLInputElement>(null);
 
   const handlePrev = async () => {
     if (!note) return;
@@ -22,6 +25,38 @@ export default function Notes() {
     if (!noteRes) return;
     setNote(noteRes);
   };
+
+  useEffect(() => {
+    const prevHandler = (e: KeyboardEvent) => {
+      e.stopPropagation();
+      console.log("(Notes)", e.key);
+      if (e.key == "ArrowLeft") {
+        console.log("go to prev note");
+        handlePrev();
+        // prevBtn.current.click();
+      }
+      if (e.key == "ArrowRight") {
+        console.log("go to prev note");
+        handleNext();
+        // nextBtn.current.click();
+      }
+      if (e.ctrlKey && e.key == "k") {
+        console.log("Focus on input");
+        inp?.current?.focus();
+        // nextBtn.current.click();
+      }
+      if (e.key == "Escape") {
+        console.log("Focus on input");
+        inp?.current?.blur();
+        // nextBtn.current.click();
+      }
+    };
+
+    window.addEventListener("keydown", prevHandler);
+
+    // Clean up during unmounting
+    return () => window.removeEventListener("keydown", prevHandler);
+  }, [handleNext, handlePrev]); // closure
 
   const handleKeyPress = async (e: KeyboardEvent<HTMLElement>) => {
     if (e.ctrlKey && e.key == "Enter") {
@@ -59,6 +94,7 @@ export default function Notes() {
       </div>
       <div className="mt-6 flex justify-between px-8">
         <Button
+          ref={prevBtn}
           disabled={note?.seq_no == 0}
           onClick={handlePrev}
           className="border-gray-600 bg-gray-700 text-gray-100 hover:bg-gray-600"
@@ -66,6 +102,7 @@ export default function Notes() {
           Prev
         </Button>
         <Button
+          ref={nextBtn}
           disabled={note?.seq_no == lenNotes - 1}
           onClick={handleNext}
           className="border-gray-600 bg-gray-700 text-gray-100 hover:bg-gray-600"
@@ -79,9 +116,13 @@ export default function Notes() {
   return (
     <div>
       <Editor
+        ref={inp}
         value={value}
-        onValueChange={setValue}
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
         onKeyDown={handleKeyPress}
+        placeholder="Notes"
       />
       {!!lenNotes && renderNotesViewer()}
     </div>

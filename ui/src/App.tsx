@@ -6,39 +6,41 @@ import { ConfigProvider } from "./components/ConfigProvider";
 import RouteProvider, { Route } from "./components/RouteProvider";
 import ActionBar from "./components/ActionBar";
 import Notes from "./components/Notes";
-import { useShortcut } from "@/hooks";
+import ShortcutProvider from "./components/ShortcutProvider";
+import { useShortcut } from "./hooks";
 
 const App = () => {
-  const [route, setRoute] = useState("/launcher");
-  const navItems = {
-    ai: "AI",
-    notes: "Notes",
-  };
-
-  useShortcut("Ctrl-N", () => {
+  useShortcut("Ctrl+N", "Change to Notes Mode", () => {
     setRoute("/notes");
   });
-  useShortcut("Ctrl-I", () => {
+
+  useShortcut("Ctrl+I", "Change to Launcher Mode", () => {
     setRoute("/launcher");
   });
 
-  useShortcut("Ctrl-P", () => {
+  useShortcut("Ctrl+P", "Change to Preferences Mode", () => {
     setRoute("/preferences");
   });
 
-  useShortcut("Ctrl-A", (e) => {
+  useShortcut("Ctrl+A", "Handle Ctrl-A", (e) => {
     const target = e.target;
     if (target instanceof HTMLElement && target?.tagName != "INPUT") {
       e.preventDefault();
     }
   });
 
-  useShortcut("ESCAPE", (e) => {
+  useShortcut("ESCAPE", "Handle Escape key", (e) => {
     const target = e.target;
     if (target instanceof HTMLElement && target?.tagName === "INPUT") {
       target.blur();
     }
   });
+
+  const [route, setRoute] = useState("/launcher");
+  const navItems = {
+    ai: "AI",
+    notes: "Notes",
+  };
 
   const navItemsRoute: Record<string, string> = {
     ai: "/launcher",
@@ -81,4 +83,15 @@ const App = () => {
   );
 };
 
-export default App;
+const AppWrapper = () => {
+  console.log("hello");
+  return (
+    <div>
+      <ShortcutProvider>
+        <App />
+      </ShortcutProvider>
+    </div>
+  );
+};
+
+export default AppWrapper;

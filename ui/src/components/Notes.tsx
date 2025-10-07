@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { KeyboardEvent } from "react";
 import Editor from "./Editor";
 import { Button } from "./ui/button";
-import NoteService, { SequenceNote, Note } from "../utils/notes";
+import NoteService, { SequenceNote } from "../utils/notes";
 import { useShortcut } from "@/hooks";
 
 export default function Notes() {
@@ -38,22 +38,21 @@ export default function Notes() {
   handlersRef.current.handleNext = handleNext;
   handlersRef.current.handlePrev = handlePrev;
 
-  useShortcut("ARROWLEFT", () => {
-    console.log("go to prev note");
+  useShortcut("ARROWLEFT", "Go to previous note", () => {
     handlersRef.current.handlePrev();
   });
 
-  useShortcut("ARROWRIGHT", () => {
+  useShortcut("ARROWRIGHT", "Go to next note", () => {
     console.log("go to next note");
     handlersRef.current.handleNext();
   });
 
-  useShortcut("Ctrl-K", () => {
+  useShortcut("Ctrl+K", "Focus on input", () => {
     console.log("Focus on input");
     inp?.current?.focus();
   });
 
-  useShortcut("ESCAPE", () => {
+  useShortcut("ESCAPE", "Blur input", () => {
     console.log("Blur input");
     inp?.current?.blur();
   });

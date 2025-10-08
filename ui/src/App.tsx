@@ -8,6 +8,7 @@ import ActionBar from "./components/ActionBar";
 import Notes from "./components/Notes";
 import ShortcutProvider from "./components/ShortcutProvider";
 import { useShortcut } from "./hooks";
+import { Rag } from "./components/Rag";
 
 const App = () => {
   useShortcut("Ctrl+N", "Change to Notes Mode", () => {
@@ -20,6 +21,10 @@ const App = () => {
 
   useShortcut("Ctrl+P", "Change to Preferences Mode", () => {
     setRoute("/preferences");
+  });
+
+  useShortcut("Ctrl+D", "Change to RAG Mode", () => {
+    setRoute("/rag");
   });
 
   useShortcut("Ctrl+A", "Handle Ctrl-A", (e) => {
@@ -50,6 +55,12 @@ const App = () => {
       route: "/notes",
       shortcut: "Ctrl + N",
     },
+    {
+      id: "rag",
+      name: "RAG",
+      route: "/rag",
+      shortcut: "Ctrl + D",
+    },
   ];
 
   const handleButtonClick = () => {
@@ -76,6 +87,9 @@ const App = () => {
             </Route>
             <Route route="/notes">
               <Notes />
+            </Route>
+            <Route route="/rag">
+              <Rag />
             </Route>
           </RouteProvider>
           <div className="border-t-1">

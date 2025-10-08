@@ -6,13 +6,17 @@ export const useShortcut = (
   description: string,
   handler: (e: KeyboardEvent) => void,
 ) => {
-  const { registerShortcut } = useShortcutContext();
+  const { registerShortcut, unregisterShortcut } = useShortcutContext();
   useEffect(() => {
-    console.log("register");
-    registerShortcut({
+    const shortcut = {
       accelerator,
       description,
       handler,
-    });
+    };
+    registerShortcut(shortcut);
+
+    return () => {
+      unregisterShortcut(shortcut);
+    };
   }, []);
 };

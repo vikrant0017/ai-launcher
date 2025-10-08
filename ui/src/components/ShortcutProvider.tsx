@@ -7,8 +7,9 @@ export interface Shortcut {
 }
 
 export interface ShortcutContext {
-  shortcuts: Shortcut[] | [];
-  registerShortcut: (shortcut: Shortcut) => void;
+  shortcuts: Shortcut[] | Shortcut;
+  registerShortcut: (shortcut: Shortcut[] | Shortcut) => void;
+  unregisterShortcut: (shortcut: Shortcut[] | Shortcut) => void;
 }
 
 const ShortcutContext = createContext<ShortcutContext | undefined>(undefined);
@@ -18,20 +19,30 @@ type ShortcutProviderProps = {
 };
 
 export default function ShortcutProvider({ children }: ShortcutProviderProps) {
-  const [shortcuts, setShortcut] = useState<Shortcut[] | []>([]);
+  const [shortcuts, setShortcut] = useState<Set<Shortcut>>(new Set());
 
   const registerShortcut = (shortcut: Shortcut | Shortcut[]) => {
     const newShortcuts = !Array.isArray(shortcut) ? [shortcut] : shortcut;
 
-    setShortcut((prevShortcuts) => [...prevShortcuts, ...newShortcuts]);
+    // Only add shortcuts not currently in the shortcuts array
+    setShortcut((prevShortcuts) => prevShortcuts.union(new Set(newShortcuts)));
+  };
+
+  const unregisterShortcut = (shortcut: Shortcut | Shortcut[]) => {
+    const oldShortcuts = !Array.isArray(shortcut) ? [shortcut] : shortcut;
+
+    setShortcut((prevShortcuts) =>
+      prevShortcuts.difference(new Set(oldShortcuts)),
+    );
   };
 
   useEffect(() => {
-    console.log(shortcuts);
+    // console.log(shortcuts);
     const eventHandlers: ((e: KeyboardEvent) => void)[] = [];
 
     shortcuts.forEach((shortcut) => {
       const shortcutHandler = (e: KeyboardEvent) => {
+        // TODO: Make handing accelerators more robust. This breaks if keys provided in differnt order
         const acc = `${e.ctrlKey ? "Ctrl+" : ""}${e.shiftKey ? "Shift+" : ""}${e.key.toUpperCase()}`;
         if (acc == shortcut.accelerator) {
           shortcut.handler(e);
@@ -42,6 +53,7 @@ export default function ShortcutProvider({ children }: ShortcutProviderProps) {
     });
 
     return () => {
+      // console.log("Dismounting", eventHandlers);
       eventHandlers.forEach((handler) => {
         window.removeEventListener("keydown", handler);
       });
@@ -49,7 +61,13 @@ export default function ShortcutProvider({ children }: ShortcutProviderProps) {
   }, [shortcuts]);
 
   return (
-    <ShortcutContext.Provider value={{ shortcuts, registerShortcut }}>
+    <ShortcutContext.Provider
+      value={{
+        shortcuts: Array.from(shortcuts),
+        registerShortcut,
+        unregisterShortcut,
+      }}
+    >
       {children}
     </ShortcutContext.Provider>
   );

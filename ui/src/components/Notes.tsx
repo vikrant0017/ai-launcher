@@ -69,10 +69,7 @@ export default function Notes() {
 
   const renderNotesViewer = () => (
     <>
-      <div
-        className="space-y-6 border border-gray-700 bg-gray-900 p-6 pl-8 leading-7 text-gray-100 [&:not(:first-child)]:mt-6"
-        id="notes"
-      >
+      <div className="space-y-6 p-6 pl-8" id="notes">
         <div className="text-lg text-gray-100">{note && note.note.content}</div>
         <div className="text-sm font-medium text-gray-400">
           {note?.note?.datetime &&
@@ -80,7 +77,7 @@ export default function Notes() {
         </div>
         <div className="flex flex-wrap gap-2">
           {note &&
-            note?.note?.tags &&
+            note?.note?.tags?.length &&
             note?.note?.tags.map((tag, index) => (
               <span
                 key={index}
@@ -121,7 +118,7 @@ export default function Notes() {
           setValue(e.target.value);
         }}
         onKeyDown={handleKeyPress}
-        placeholder="Notes"
+        placeholder="Write your notes"
       />
       {!!lenNotes && renderNotesViewer()}
     </div>

@@ -47,6 +47,7 @@ export function Launcher() {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           disabled={isInputDisabled}
+          placeholder="Chat with AI"
           autoFocus
         />
 

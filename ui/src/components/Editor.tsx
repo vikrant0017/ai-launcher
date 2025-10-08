@@ -42,7 +42,7 @@ function Editor({
     "col-start-1 row-start-1 w-full min-h-[50px] p-2.5 m-0 bg-transparent border-none outline-none box-border whitespace-pre-wrap break-words font-inherit text-inherit leading-relaxed resize-none";
 
   return (
-    <div className="border-border bg-background grid w-full border font-mono text-sm">
+    <div className="border-border bg-background grid w-full border">
       <textarea
         value={value}
         onChange={onChange}

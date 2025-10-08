@@ -37,22 +37,30 @@ const App = () => {
   });
 
   const [route, setRoute] = useState("/launcher");
-  const navItems = {
-    ai: "AI",
-    notes: "Notes",
-  };
-
-  const navItemsRoute: Record<string, string> = {
-    ai: "/launcher",
-    notes: "/notes",
-  };
+  const navItems = [
+    {
+      id: "ai",
+      name: "AI",
+      route: "/launcher",
+      shortcut: "Ctrl + I",
+    },
+    {
+      id: "notes",
+      name: "Notes",
+      route: "/notes",
+      shortcut: "Ctrl + N",
+    },
+  ];
 
   const handleButtonClick = () => {
     setRoute("/preferences");
   };
 
   const handleNavItemChange = (val: string) => {
-    setRoute(navItemsRoute[val]);
+    const item = navItems.find(({ id }) => id == val);
+    if (item) {
+      setRoute(item.route);
+    }
   };
 
   return (

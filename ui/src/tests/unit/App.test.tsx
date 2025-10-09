@@ -30,7 +30,7 @@ describe("App component", () => {
     // Wait for the component to update after fetching the config
     await waitFor(() => {
       // Check if the Launcher component is rendered
-      expect(screen.getByPlaceholderText(/ask ai.../i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/Chat with AI/i)).toBeInTheDocument();
     });
   });
 });

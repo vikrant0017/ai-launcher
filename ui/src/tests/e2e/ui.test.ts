@@ -53,7 +53,7 @@ test("Displays the AI searchbox on launch", async () => {
   const page: Page = await electronApp.firstWindow();
   await expect(page.getByRole("searchbox")).toHaveAttribute(
     "placeholder",
-    "Ask AI...",
+    "Chat with AI",
   );
 });
 
@@ -72,7 +72,7 @@ test("Loads and shows default config values in Preferences page", async () => {
   await page.getByRole("button", { name: "Close" }).click();
   await expect(page.getByRole("searchbox")).toHaveAttribute(
     "placeholder",
-    "Ask AI...",
+    "Chat with AI",
   );
 });
 

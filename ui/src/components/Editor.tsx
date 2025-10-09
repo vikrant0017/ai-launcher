@@ -30,26 +30,29 @@ interface EditorProps {
   onKeyDown?: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
 }
 
-const Editor: React.FC<EditorProps> = ({ value, onValueChange, onKeyDown }) => {
-  const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onValueChange(event.target.value);
-  };
-
+function Editor({
+  value,
+  onChange,
+  onKeyDown,
+  placeholder,
+  ...props
+}: React.ComponentProps<"input">) {
   // Shared Tailwind classes for the textarea and the highlighter div
   const sharedClasses =
     "col-start-1 row-start-1 w-full min-h-[50px] p-2.5 m-0 bg-transparent border-none outline-none box-border whitespace-pre-wrap break-words font-inherit text-inherit leading-relaxed resize-none";
 
   return (
-    <div className="border-border bg-background grid w-full border font-mono text-sm">
+    <div className="border-border bg-background grid w-full border">
       <textarea
         value={value}
-        onChange={handleTextChange}
+        onChange={onChange}
         onKeyDown={onKeyDown}
-        className={`${sharedClasses} caret-foreground z-10 text-transparent`}
+        className={`${sharedClasses} caret-foreground placeholder:text-muted-foreground z-10 text-transparent`}
         spellCheck="false"
-        placeholder="Type here... #tag or https://link"
+        placeholder={placeholder}
         autoFocus
         rows={1}
+        {...props}
       />
       <div
         className={`${sharedClasses} text-foreground pointer-events-none z-0`}
@@ -59,6 +62,6 @@ const Editor: React.FC<EditorProps> = ({ value, onValueChange, onKeyDown }) => {
       />
     </div>
   );
-};
+}
 
 export default Editor;

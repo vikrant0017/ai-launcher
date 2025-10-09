@@ -1,7 +1,7 @@
-import React, { useRef } from "react";
+import React from "react";
 import { KeyboardEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { ask, rag } from "@/utils/ai";
+import { rag } from "@/utils/ai";
 import { Button } from "./ui/button";
 import { CornerDownLeft } from "lucide-react";
 
@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-export function Launcher() {
+export function Rag() {
   const [answer, setAnswer] = useState("");
   const [question, setQuestion] = useState("");
   const [isInputDisabled, setInputDisabled] = useState(false);
@@ -25,7 +25,7 @@ export function Launcher() {
 
   const sendQuestion = async () => {
     setInputDisabled(true);
-    const response = await ask(question);
+    const response = await rag(question);
     setAnswer(response);
     setQuestion("");
     setInputDisabled(false);
@@ -39,7 +39,7 @@ export function Launcher() {
 
   return (
     <div>
-      <div id="launcher-inputbox" className="flex items-center">
+      <div id="rag-inputbox" className="flex items-center">
         <Input
           type="search"
           className="!bg-background border-round focus-visible:border-ring-none h-15 rounded-none border-0 border-b-1 pl-8 outline-none [&:focus]:ring-0"
@@ -47,7 +47,7 @@ export function Launcher() {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           disabled={isInputDisabled}
-          placeholder="Chat with AI"
+          placeholder="Chat with your documents"
           autoFocus
         />
 

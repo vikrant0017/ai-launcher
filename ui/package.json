@@ -9,7 +9,7 @@
     "start": "electron-forge start",
     "package": "cross-env NODE_ENV='production' electron-forge package",
     "package:test": "cross-env NODE_ENV='test' electron-forge package",
-    "make": "electron-forge make",
+    "make": "cross-env NODE_ENV='production' electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint .",
     "format": "prettier --check .",

@@ -16,6 +16,7 @@ console.log("ELECTRON PACKAGING ENVIROMENT", nodeEnv);
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: 'src/assets/app-icons/app-icon',
     ...(isProd ? { extraResource: "../backend/dist/server" } : {}), // gos to <appname>/resources/server
   },
   rebuildConfig: {},

@@ -1,29 +1,77 @@
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Launcher } from "@/components/Launcher";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Preferences from "./components/Preferences";
 import { ConfigProvider } from "./components/ConfigProvider";
 import RouteProvider, { Route } from "./components/RouteProvider";
 import ActionBar from "./components/ActionBar";
 import Notes from "./components/Notes";
+import ShortcutProvider from "./components/ShortcutProvider";
+import { useShortcut } from "./hooks";
+import { Rag } from "./components/Rag";
 
 const App = () => {
+  useShortcut("Ctrl+N", "Change to Notes Mode", () => {
+    setRoute("/notes");
+  });
+
+  useShortcut("Ctrl+I", "Change to Launcher Mode", () => {
+    setRoute("/launcher");
+  });
+
+  useShortcut("Ctrl+P", "Change to Preferences Mode", () => {
+    setRoute("/preferences");
+  });
+
+  useShortcut("Ctrl+D", "Change to RAG Mode", () => {
+    setRoute("/rag");
+  });
+
+  useShortcut("Ctrl+A", "Handle Ctrl-A", (e) => {
+    const target = e.target;
+    if (target instanceof HTMLElement && target?.tagName != "INPUT") {
+      e.preventDefault();
+    }
+  });
+
+  useShortcut("ESCAPE", "Handle Escape key", (e) => {
+    const target = e.target;
+    if (target instanceof HTMLElement && target?.tagName === "INPUT") {
+      target.blur();
+    }
+  });
+
   const [route, setRoute] = useState("/launcher");
-  const navItems = {
-    ai: "AI",
-    notes: "Notes",
-  };
-  const navItemsRoute: Record<string, string> = {
-    ai: "/launcher",
-    notes: "/notes",
-  };
+  const navItems = [
+    {
+      id: "ai",
+      name: "AI",
+      route: "/launcher",
+      shortcut: "Ctrl + I",
+    },
+    {
+      id: "notes",
+      name: "Notes",
+      route: "/notes",
+      shortcut: "Ctrl + N",
+    },
+    {
+      id: "rag",
+      name: "RAG",
+      route: "/rag",
+      shortcut: "Ctrl + D",
+    },
+  ];
 
   const handleButtonClick = () => {
     setRoute("/preferences");
   };
 
   const handleNavItemChange = (val: string) => {
-    setRoute(navItemsRoute[val]);
+    const item = navItems.find(({ id }) => id == val);
+    if (item) {
+      setRoute(item.route);
+    }
   };
 
   return (
@@ -40,6 +88,9 @@ const App = () => {
             <Route route="/notes">
               <Notes />
             </Route>
+            <Route route="/rag">
+              <Rag />
+            </Route>
           </RouteProvider>
           <div className="border-t-1">
             <ActionBar
@@ -54,4 +105,15 @@ const App = () => {
   );
 };
 
-export default App;
+const AppWrapper = () => {
+  console.log("hello");
+  return (
+    <div>
+      <ShortcutProvider>
+        <App />
+      </ShortcutProvider>
+    </div>
+  );
+};
+
+export default AppWrapper;

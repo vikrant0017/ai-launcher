@@ -1,6 +1,13 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Circle, Settings } from "lucide-react";
+
+interface MenuItem {
+  id: string;
+  name: string;
+  route: string;
+  shortcut?: string;
+}
 
 import {
   DropdownMenu,
@@ -9,22 +16,38 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "./ui/label";
+import { Kbd } from "./ui/kbd";
+import { useShortcut } from "@/hooks";
 
 interface ModelSelectionMenuProps {
   initialValue: string;
-  menuItems: Record<string, string>;
+  menuItems: MenuItem[];
   onValueChange: (val: string) => void;
+  label: string;
 }
 
 export function ModeSelectionMenu({
   initialValue,
   menuItems,
   onValueChange,
+  label,
 }: ModelSelectionMenuProps) {
   const [position, setPosition] = React.useState(initialValue);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+
+  useShortcut("Ctrl+M", "Open Select Mode Menu", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (btnRef.current) {
+      // Verfies if component is mounted before setting state
+      setOpen(!open);
+    }
+  });
 
   const handleValueChange = (val: string) => {
     setPosition(val);
@@ -32,11 +55,11 @@ export function ModeSelectionMenu({
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <div>
-          <Button variant="ghost">
-            <Circle /> {menuItems[position]}
+          <Button variant="ghost" ref={btnRef}>
+            {label} <Kbd>Ctrl + M</Kbd>
           </Button>
         </div>
       </DropdownMenuTrigger>
@@ -45,9 +68,14 @@ export function ModeSelectionMenu({
           value={position}
           onValueChange={handleValueChange}
         >
-          {Object.entries(menuItems).map(([key, value]) => (
-            <DropdownMenuRadioItem key={key} value={key}>
-              {value}
+          {menuItems.map((item) => (
+            <DropdownMenuRadioItem key={item.id} value={item.id}>
+              {item.name}
+              {item.shortcut && (
+                <DropdownMenuShortcut>
+                  <Kbd>{item.shortcut}</Kbd>
+                </DropdownMenuShortcut>
+              )}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
@@ -56,22 +84,29 @@ export function ModeSelectionMenu({
   );
 }
 
+interface ActionBarProps {
+  navItems: MenuItem[];
+  onNavItemChange: (val: string) => void;
+  onButtonClick: () => void;
+}
+
 export default function ActionBar({
   navItems,
   onNavItemChange,
   onButtonClick,
-}) {
+}: ActionBarProps) {
   return (
     <div className="flex justify-between px-8 py-2">
       {/* Use this as a navigation menu*/}
       <ModeSelectionMenu
-        initialValue={Object.keys(navItems)[0]}
+        initialValue={navItems[0].id}
         menuItems={navItems}
         onValueChange={onNavItemChange}
+        label="Select Mode"
       />
       <Button variant="ghost" onClick={onButtonClick}>
         <Settings />
-        Preferences
+        Preferences <Kbd>Ctrl + P</Kbd>
       </Button>
     </div>
   );

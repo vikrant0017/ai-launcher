@@ -10,6 +10,8 @@ import {
 } from "electron";
 import dotenv from "dotenv";
 import registerListeners from "./helpers/ipc/listeners-register";
+import fs from "node:fs";
+import net from "node:net";
 // "electron-squirrel-startup" seems broken when packaging with vite
 //import started from "electron-squirrel-startup";
 import path from "path";
@@ -134,6 +136,39 @@ function createTray(mainWindow: BrowserWindow) {
 
   return tray;
 }
+
+let server: net.Server | null = null;
+const SOCKET_PATH = "/tmp/myapp-ipc.sock";
+
+// Clean up old socket
+if (fs.existsSync(SOCKET_PATH)) {
+  fs.unlinkSync(SOCKET_PATH);
+}
+
+// Create IPC server
+const initializeSever = (mainWindow: BrowserWindow): net.Server => {
+  return net.createServer((socket) => {
+    socket.on("data", (data) => {
+      const command = data.toString().trim();
+
+      console.log("SOCKET DATA", command);
+
+      if (command === "toggle") {
+        if (mainWindow.isVisible()) {
+          mainWindow.hide();
+        } else {
+          mainWindow.show();
+          mainWindow.focus();
+        }
+      } else if (command === "show") {
+        mainWindow.show();
+        mainWindow.focus();
+      } else if (command === "hide") {
+        mainWindow.hide();
+      }
+    });
+  });
+};
 
 // main.js
 async function installExtensions() {
@@ -263,6 +298,9 @@ app.whenReady().then(async () => {
   // Create system tray
   createTray(win);
 
+  server = initializeSever(win);
+  server.listen(SOCKET_PATH);
+
   // Register global shortcut to toggle window
   const ret = globalShortcut.register("CommandOrControl+Shift+Space", () => {
     toggleWindow(win);
@@ -294,5 +332,12 @@ app.on("will-quit", () => {
 
   if (pythonProcess) {
     pythonProcess.kill();
+  }
+
+  if (server) {
+    server.close();
+    if (fs.existsSync(SOCKET_PATH)) {
+      fs.unlinkSync(SOCKET_PATH);
+    }
   }
 });

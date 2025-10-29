@@ -2,6 +2,8 @@
 
 A desktop launcher that combines AI chat capabilities, RAG (Retrieval-Augmented Generation) for document querying with local models, and a note capturing
 
+![AI Launcher Demo](./ailauncher.png)
+
 ## ✨ Features
 - 🤖 AI Chat - Direct conversation with AI using Gemini API
 - 📚 RAG Mode (Document Q&A) - Query your personal document collection using natural language (Supports `.md` and `.txt` files)
